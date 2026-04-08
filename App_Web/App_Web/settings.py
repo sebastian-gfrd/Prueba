@@ -13,6 +13,7 @@ import environ
 env = environ.Env(
     DJANGO_DEBUG=(bool, True),
     DJANGO_ALLOWED_HOSTS=(list, ["*"]),
+    DJANGO_CSRF_TRUSTED_ORIGINS=(list, ["https://prueba-468213557134.us-central1.run.app"]),
 )
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +30,10 @@ SECRET_KEY = env("DJANGO_SECRET_KEY", default=_DEFAULT_SECRET)
 DEBUG = env("DJANGO_DEBUG")
 
 ALLOWED_HOSTS = env("DJANGO_ALLOWED_HOSTS")
+
+# CSRF & Security
+CSRF_TRUSTED_ORIGINS = env("DJANGO_CSRF_TRUSTED_ORIGINS")
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # Application definition
