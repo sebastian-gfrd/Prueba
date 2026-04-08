@@ -2,7 +2,7 @@ from decimal import Decimal, InvalidOperation
 
 from django.core.cache import cache
 from rest_framework import generics, status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
@@ -10,7 +10,14 @@ from .infrautilizados_service import (
     DEFAULT_UMBRAL_INFRAUTILIZADO_PCT,
     queryset_recursos_infrautilizados,
 )
-from .models import RolCliente, SolicitudReporteMensual
+from .models import (
+    Area,
+    Empresa,
+    Proyecto,
+    RecursoCloud,
+    RolCliente,
+    SolicitudReporteMensual,
+)
 from .serializers import (
     RecursoInfrautilizadoSerializer,
     SolicitudReporteMensualSerializer,
@@ -134,3 +141,21 @@ class RecursosInfrautilizadosView(APIView):
         cache.set(cache_key, {**response_data, "cached": True}, timeout=60)
 
         return Response(response_data)
+
+class PerformancePublicStatsView(APIView):
+    """
+    Endpoint público para medir rendimiento de BD sin sesión.
+    Retorna conteos agregados de las entidades principales.
+    """
+
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        data = {
+            "total_empresas": Empresa.objects.count(),
+            "total_areas": Area.objects.count(),
+            "total_proyectos": Proyecto.objects.count(),
+            "total_recursos": RecursoCloud.objects.count(),
+            "status": "online",
+        }
+        return Response(data)
